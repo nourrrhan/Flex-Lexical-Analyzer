@@ -1,0 +1,52 @@
+
+public class test {
+
+    static void fun(int n)
+    {
+        if(n <= 0)
+            n = 1;
+        for(int i = 0; i < n; i++) {
+            System.out.println(i);
+            if(n == 1000)
+                n += 3;
+            else if (n < 200)
+                n++;
+            else
+                break;
+        }
+    }
+
+    int x = 10 & 8;
+    int [] array = new int[5];
+    float f = 0.12f;
+    String s = "name";
+    char c = 'g';
+    String cc = "\t";
+    int a = 0xFF;
+    int b = 077;
+    int d = 0b00001111;
+    bool flag = true;
+    float y = x + f;
+    String s1 = null;
+    byte g = (byte) 0b11110000;
+
+    switch(x)
+    {
+        case 1:
+            System.out.println(1);
+            break;
+        case 10:
+            continue;
+    }
+
+    String ss = """
+            sdfsdfdsf
+            jnklklsdkml
+            """;
+    // this is the
+    
+/*
+        end of code
+*/
+
+}

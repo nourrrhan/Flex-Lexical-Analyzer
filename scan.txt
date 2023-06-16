@@ -1,0 +1,87 @@
+Keyword    "abstract"|"continue"|"for"|"new"|"switch"|"assert"|"default"|"if"|"package"|"synchronized"|"boolean"|"do"|"goto"|"private"|"this"|"break"|"double"|"implements"|"protected"|"throw"|"byte"|"else"|"import"|"public"|"throws"|"case"|"enum"|"instanceof"|"return"|"transient"|"catch"|"extends"|"int"|"short"|"try"|"char"|"final"|"interface"|"static"|"void"|"class"|"finally"|"long"|"strictfp"|"volatile"|"const"|"float"|"native"|"super"|"while"|"string"|"String"
+letter [A-Za-z_]
+Sub	[^Z]
+digit  [0-9]
+digits [0-9]+
+nonzerodigit [1-9]
+decimalnumeral {nonzerodigit}({digit})* 
+Hexdigit      [0-9a-fA-F]
+Hexdigits      [0-9a-fA-F]+
+Hexnumeral     (0X{Hexdigit}{Hexdigit}|0x{Hexdigit}{Hexdigit})
+Octaldigit    [0-7]+
+Octalnumeral  (0{Octaldigit})
+Binarydigit   [01]
+Binarynumeral (0B{Binarydigit}{Binarydigit}{Binarydigit}{Binarydigit}{Binarydigit}{Binarydigit}{Binarydigit}{Binarydigit}|0b{Binarydigit}{Binarydigit}{Binarydigit}{Binarydigit}{Binarydigit}{Binarydigit}{Binarydigit}{Binarydigit})
+FloatTypeSuffix    f|F|d|D 
+Sign		   [+-]
+SignDigit	 {Sign}?({digit})+
+ExponentIndicator  [eE]
+ExponentPart      {ExponentIndicator}{SignDigit}
+Floatpoint1       ({digits}.{digits}{ExponentPart}?{FloatTypeSuffix})
+Floatpoint2	  (.{digits}{ExponentPart}?{FloatTypeSuffix})
+WS     [ \t\f\n\r\n]+
+WS2    [ \t\f\r]*
+Floatpoint3	  ({digits}{ExponentPart}?{FloatTypeSuffix}) 
+InputCharacter         [^"\\"|"\'"]
+UnicodeMarker		[uU]
+UnicodeEscape		("\\"{UnicodeMarker}{Hexdigit}{Hexdigit}{Hexdigit}{Hexdigit})
+EscapeSequence		({UnicodeEscape}|"\t"|"\b"|"\n"|"\f"|"\r"|"\""|"\'"|"\\")
+CharacterLiteral	(("\'"{EscapeSequence}"\'")|("\'"{InputCharacter}"\'"))
+InputCharacterS         [^"\\"|"\""]|{WS}
+EscapeSequence2		({UnicodeEscape}|"\t"|"\b"|"\f"|"\r"|0"\""|"\'"|"\\")
+InputCharacterS2         [^"\\"|"\""|"\n"]|{WS2}
+StringLiteral	(("\""{EscapeSequence2}"\"")|("\""{InputCharacterS2}*"\""))
+TextBlock	(("\"\"\""{EscapeSequence}"\"\"\"")|("\"\"\""{InputCharacterS}*"\"\"\""))
+IntegerLiteral		({decimalnumeral}|{Binarynumeral}|{Octalnumeral}|{Hexnumeral}|0)
+DecimalFloatingPointLiteral ({Floatpoint1}|{Floatpoint2}|{Floatpoint3})
+BooleanLiteral "true"|"false"
+NullLiteral     "null"
+Separators     "("|")"|"{"|"}"|"["|"]"|";"|","|"."|"..."|"@"|"::"
+Operators      "="|">"|"<"|"!"|"~"|"?"|":"|"->"|"=="|">="|"<="|"!="|"&&"|"||"|"++"|"--"|"+"|"-"|"*"|"/"|"&"|"|"|"^"|"%"|"<<"|">>"|"+="|"-="|"*="|"/="|"&="|"|="|"^="|"%="
+Identifier {letter}({letter}|{digit})*
+Text        ({Identifier}|{Operators}|{Separators}|{NullLiteral}|{BooleanLiteral}|{DecimalFloatingPointLiteral}|{IntegerLiteral}|{StringLiteral}|{CharacterLiteral}|{Keyword}|{letter}|{digit}*|{WS2}*)
+SingleComment	("/""/"{Text}*)
+
+MultiComment	((("/*"){EscapeSequence}("*/"))|(("/*"){InputCharacterS}*("*/")))
+
+
+%%
+{SingleComment}				{printf("<%s,SingleComment> ",yytext);}
+{MultiComment}				{printf("<%s,MultiComment> ",yytext);}
+{Keyword}                          	{printf("<%s,KW> ",yytext);}
+{WS}                                    {printf("<%s,WS> ",yytext);}
+{IntegerLiteral}			{printf("<%s,Int> ",yytext);}
+{BooleanLiteral}			{printf("<%s,BooleanLiteral> ",yytext);}
+{NullLiteral}				{printf("<%s,NullLiteral> ",yytext);}
+{Separators}				{printf("<%s,Separators> ",yytext);}
+{Operators}				{printf("<%s,Operators> ",yytext);}
+{DecimalFloatingPointLiteral}	        {printf("<%s,Float> ",yytext);}
+{CharacterLiteral}			{printf("<%s,Char> ",yytext);}
+{TextBlock}				{printf("<%s,TextBlock> ",yytext);}
+{StringLiteral}				{printf("<%s,String> ",yytext);}
+{Identifier}                            {printf("<%s,ID> ",yytext);}
+.
+%%
+
+int yywrap(){
+
+return 1;
+}
+
+int main(argc, argv)
+int argc;
+char **argv;
+{
+ YY_BUFFER_STATE bp; //create buffer
+ extern FILE* yyin;
+ 
+ if (argc>1) {
+  yyin = fopen(argv[1],"r");
+ } else {
+  yyin = stdin;
+  bp = yy_create_buffer(yyin, YY_BUF_SIZE); // YY_BUF_SIZE defined by flex, typically 16K=16384
+  yy_switch_to_buffer(bp);  // tell it to use the buffer we just made
+ }
+ yylex();
+return 0;
+}
